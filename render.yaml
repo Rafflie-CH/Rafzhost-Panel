@@ -1,0 +1,42 @@
+services:
+  - type: web
+    name: pterodactyl-panel
+    env: php
+    plan: free
+    region: singapore
+    buildCommand: |
+      composer install --no-dev --optimize-autoloader
+      cp .env.example .env
+      php artisan key:generate --force
+      php artisan migrate --seed --force
+    startCommand: php artisan serve --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_URL
+        value: https://pteropanel.onrender.com
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_HOST
+        fromDatabase:
+          name: pterodactyl-db
+          property: host
+      - key: DB_DATABASE
+        fromDatabase:
+          name: pterodactyl-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: pterodactyl-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: pterodactyl-db
+          property: password
+
+databases:
+  - name: pterodactyl-db
+    databaseName: pterodactyl
+    user: admin
